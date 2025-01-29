@@ -11,7 +11,7 @@ import com.example.entity.Message;
 public class MessageService {
     private AccountService accountService;
 
-    private List<Message> messageList = new ArrayList<>();
+    //private List<Message> messageList = new ArrayList<>(); // wont need
 
     //populate list with data from db 
     //{

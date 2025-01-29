@@ -10,7 +10,7 @@ import com.example.entity.Account;
 @Service
 public class AccountService {
 
-    private List<Account> accountList = new ArrayList<>();
+    //private List<Account> accountList = new ArrayList<>(); //wont need
     //populate list with data from db 
     //{
         //accountList.add(new Account())
