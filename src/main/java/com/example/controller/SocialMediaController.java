@@ -31,16 +31,13 @@ import javassist.tools.web.BadHttpRequest;
 @RestController
 public class SocialMediaController {
 
-    //private AccountService accountService;
-    private MessageService messageService;
+    private final AccountService accountService;
 
-    // @Autowired
-    // public SocialMediaController (AccountService accountService){ 
-    //     this.accountService = accountService;
-    // }
+    private final MessageService messageService;
 
     @Autowired
-    public SocialMediaController (MessageService messageService){
+    public SocialMediaController (AccountService accountService, MessageService messageService){
+        this.accountService = accountService;
         this.messageService = messageService;
     }
 
