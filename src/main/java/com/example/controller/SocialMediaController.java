@@ -1,5 +1,7 @@
 package com.example.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -43,20 +45,31 @@ public class SocialMediaController {
 
     /* Registration */
     @PostMapping("/register")
-    //     public Account registerAccount (Account newAccount){
-    //     return null;
-    // }
-    public ResponseEntity<Account> registerAccount(@RequestParam String username, @RequestParam String password){
-        //call accountService
-        return null;
+    public ResponseEntity<Account> registerAccount(@RequestBody Account account){
+        for (Account acc : accountService.getAllAccounts()){ //checks if duplicate username is found
+            if (acc.getUsername().equals(account.getUsername())){
+                return ResponseEntity.status(409).build();
+            }
+        }
+    
+        if(account.getUsername() == "" || account.getPassword().length() < 4 ){
+            return ResponseEntity.status(400).build();
+        }else{
+            return ResponseEntity.ok(accountService.registerAccount(account));
+        }
     }
     
 
-    /*Login */
+    /*Login */ //might need custom query in repository
     @PostMapping("/login")
-    public Account verifyAccountLogin (@RequestBody Account account){
-        return null;
+    public ResponseEntity<Account> verifyAccountLogin (@RequestBody Account account) throws ResponseStatusException{
+        if (accountService.verifyAccount(account) != null){
+            return ResponseEntity.status(200).body(accountService.verifyAccount(account));
+        }else{
+            return ResponseEntity.status(401).build();
+        }
     }
+
 
     /*Message Creation */
     @PostMapping("/messages")
@@ -67,14 +80,14 @@ public class SocialMediaController {
 
     /*Get All Messages */
     @GetMapping("/messages")
-    public Message getAllMessages(){
-        return null;
+    public ResponseEntity<List<Message>> getAllMessages(){
+        return ResponseEntity.ok(messageService.getAllMessages());
     }
 
     /*Get a message by ID */
     @GetMapping("/messages/{messageId}")
-    public Message getMessagebyId (@PathVariable Integer messageId){
-        return null;
+    public ResponseEntity<Message> getMessagebyId (@PathVariable Integer messageId){
+        return ResponseEntity.ok(messageService.getMessageById(messageId));
     }
 
     /*Delete a message by ID */
@@ -90,15 +103,25 @@ public class SocialMediaController {
 
     /*Update a message by ID */
     @PatchMapping("/messages/{messageId}")
-    public Message updateMessagebyId (@PathVariable Integer messageId){
-        return null;
+    public ResponseEntity<Long> updateMessagebyId (@PathVariable Integer messageId, @RequestBody Message message){
+        long rowsUpdated = messageService.updateMessageById(messageId, message);
+        if (rowsUpdated > 0){
+            return ResponseEntity.ok(rowsUpdated);
+        }else{
+            return ResponseEntity.status(400).build();
+        }
     }
 
 
-    /*Get all Messages from a particular accountId/posted_by */
-    @GetMapping("/accounts/{accountId}/messages")
-    public Message getAllMessagesbyAccountId (@PathVariable Integer accountId){
-        return null;
+    /*Get all Messages from a particular accountId/posted_by */ //might need custom query in repository
+    @GetMapping("/accounts/{account_id}/messages")
+    public ResponseEntity<Message> getAllMessagesbyAccountId (@PathVariable Integer account_id){
+        if (messageService.getMessageByPostedBy(account_id) != null){
+            return ResponseEntity.ok(messageService.getMessageByPostedBy(account_id));
+        }
+        else{
+            return ResponseEntity.ok().build();
+        }
     }
 
 }

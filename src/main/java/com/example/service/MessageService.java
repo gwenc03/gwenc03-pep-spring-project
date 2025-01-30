@@ -63,18 +63,24 @@ public class MessageService {
     }
 
     /*Method to Update a message by ID */
-    public void updateMessageById (Integer MessageId, Message newMessage){
+    public long updateMessageById (Integer MessageId, Message newMessage){
+        if (newMessage.getMessageText() == "" || newMessage.getMessageText().length() > 255){
+            return 0;
+        }
         Optional<Message> messageOptional = messageRepository.findById(MessageId);
         if (messageOptional.isPresent()){
             Message message = messageOptional.get();
             message.setMessageText(newMessage.getMessageText());
             messageRepository.save(message);
+            return 1;
+        }else{
+            return 0;
         }
     }
 
-    /*Method to Get all Messages from a particular accountId/posted_by */
+    /*Method to Get all Messages from a particular accountId/posted_by */ //might need custom query in repository
     public Message getMessageByPostedBy(Integer postedBy){
-        Optional<Message> messageOptional = messageRepository.findById(postedBy);
+        Optional<Message> messageOptional = messageRepository.findMessageByPostedBy(postedBy);
         if (messageOptional.isPresent()){
             return messageOptional.get();
         }else{
