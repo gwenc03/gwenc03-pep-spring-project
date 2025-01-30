@@ -1,5 +1,7 @@
 package com.example.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -10,11 +12,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.example.entity.Account;
 import com.example.entity.Message;
 import com.example.service.AccountService;
 import com.example.service.MessageService;
+
+import javassist.tools.web.BadHttpRequest;
 
 
 /**
@@ -26,13 +31,15 @@ import com.example.service.MessageService;
 @RestController
 public class SocialMediaController {
 
-    private AccountService accountService;
+    //private AccountService accountService;
     private MessageService messageService;
 
-    public SocialMediaController (AccountService accountService){ //might need @Autowired
-        this.accountService = accountService;
-    }
+    // @Autowired
+    // public SocialMediaController (AccountService accountService){ 
+    //     this.accountService = accountService;
+    // }
 
+    @Autowired
     public SocialMediaController (MessageService messageService){
         this.messageService = messageService;
     }
@@ -56,8 +63,9 @@ public class SocialMediaController {
 
     /*Message Creation */
     @PostMapping("/messages")
-    public Message createNewMessage(Message newMessage){
-        return null;
+    public ResponseEntity<Message> createNewMessage(@RequestBody Message message) throws ResponseStatusException{
+        Message createdMessage = messageService.createMessage(message);
+        return new ResponseEntity<>(createdMessage, HttpStatus.OK);
     }
 
     /*Get All Messages */
@@ -74,8 +82,13 @@ public class SocialMediaController {
 
     /*Delete a message by ID */
     @DeleteMapping("/messages/{messageId}")
-    public Message deleteMessagebyId (@PathVariable Integer messageId){
-        return null;
+    public ResponseEntity<Long> deleteMessagebyId (@PathVariable Integer messageId){
+        long rowsDeleted = messageService.deleteMessageById(messageId);
+        if (rowsDeleted > 0){
+            return ResponseEntity.ok(rowsDeleted);
+        }else{
+            return ResponseEntity.ok().build();
+        }
     }
 
     /*Update a message by ID */
