@@ -1,5 +1,6 @@
 package com.example.service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -11,11 +12,8 @@ import org.springframework.web.server.ResponseStatusException;
 import com.example.entity.Message;
 import com.example.repository.MessageRepository;
 
-import javassist.tools.web.BadHttpRequest;
-
 @Service
 public class MessageService {
-    //private AccountService accountService;
 
     private MessageRepository messageRepository;
     @Autowired
@@ -24,7 +22,7 @@ public class MessageService {
     }
 
     /*Method to Create new messages */
-    public Message createMessage(Message message) throws ResponseStatusException{ //added postedBy exists by checking is message is not null
+    public Message createMessage(Message message) throws ResponseStatusException{
         if (message != null && message.getMessageText() != "" && message.getMessageText().length() < 255) { 
             if (messageRepository.existsById(message.getPostedBy())){
                 return messageRepository.save(message);
@@ -58,7 +56,7 @@ public class MessageService {
             messageRepository.deleteById(messageId);
             return 1;
         }else{
-            return 0;//has to be empty;
+            return 0;
         }
     }
 
@@ -78,13 +76,13 @@ public class MessageService {
         }
     }
 
-    /*Method to Get all Messages from a particular accountId/posted_by */ //might need custom query in repository
-    public Message getMessageByPostedBy(Integer postedBy){
-        Optional<Message> messageOptional = messageRepository.findMessageByPostedBy(postedBy);
-        if (messageOptional.isPresent()){
-            return messageOptional.get();
-        }else{
-            return null;
+    /*Method to Get all Messages from a particular accountId/posted_by */ 
+    public List<Message> getMessagesByPostedBy(Integer postedBy){
+        List<Message> messagesFromUser = messageRepository.findMessagesByPostedBy(postedBy);
+        if (messagesFromUser.isEmpty()){
+            return Collections.emptyList(); //return empty list
+        } else{
+            return messageRepository.findMessagesByPostedBy(postedBy);
         }
     }
 

@@ -59,8 +59,7 @@ public class SocialMediaController {
         }
     }
     
-
-    /*Login */ //might need custom query in repository
+    /*Login */
     @PostMapping("/login")
     public ResponseEntity<Account> verifyAccountLogin (@RequestBody Account account) throws ResponseStatusException{
         if (accountService.verifyAccount(account) != null){
@@ -69,7 +68,6 @@ public class SocialMediaController {
             return ResponseEntity.status(401).build();
         }
     }
-
 
     /*Message Creation */
     @PostMapping("/messages")
@@ -112,16 +110,11 @@ public class SocialMediaController {
         }
     }
 
-
-    /*Get all Messages from a particular accountId/posted_by */ //might need custom query in repository
+    /*Get all Messages from a particular accountId/posted_by */
     @GetMapping("/accounts/{account_id}/messages")
-    public ResponseEntity<Message> getAllMessagesbyAccountId (@PathVariable Integer account_id){
-        if (messageService.getMessageByPostedBy(account_id) != null){
-            return ResponseEntity.ok(messageService.getMessageByPostedBy(account_id));
-        }
-        else{
-            return ResponseEntity.ok().build();
-        }
+    public ResponseEntity<List<Message>> getAllMessagesbyAccountId (@PathVariable Integer account_id){
+        List<Message> userMessages = messageService.getMessagesByPostedBy(account_id);
+        return ResponseEntity.ok(userMessages);
     }
 
 }
